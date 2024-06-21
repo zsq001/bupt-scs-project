@@ -1,0 +1,503 @@
+basePath: /
+definitions:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.Msg:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      isRecall:
+        type: boolean
+      receiveUserID:
+        type: integer
+      receiveVisible:
+        type: boolean
+      sendTime:
+        type: integer
+      sendUserID:
+        type: integer
+      sendVisible:
+        type: boolean
+      updatedAt:
+        type: string
+    type: object
+  models.Pic:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+      uploadTime:
+        type: integer
+      userID:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  models.UserRole:
+    enum:
+    - 0
+    - 1
+    type: integer
+    x-enum-varnames:
+    - Normal
+    - Admin
+  web.Msg:
+    properties:
+      data: {}
+      error:
+        type: string
+      status:
+        type: integer
+    type: object
+  web.MsgList:
+    properties:
+      ID:
+        type: integer
+      latest_msg:
+        type: string
+      latest_msg_time:
+        type: string
+      name:
+        type: string
+    type: object
+  web.Pic:
+    properties:
+      data: {}
+      error:
+        type: string
+      status:
+        type: integer
+    type: object
+  web.User:
+    properties:
+      data: {}
+      error:
+        type: string
+      status:
+        type: integer
+    type: object
+  web.UserInfo:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/models.UserRole'
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  license:
+    name: GPL 3.0
+  title: webFinal API
+  version: "1.0"
+paths:
+  /api/v1/msg/v1/delete/{mid}:
+    get:
+      description: |-
+        message api
+        user can delete exist msg with message id
+      parameters:
+      - description: target id
+        in: path
+        name: tid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Msg'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Msg'
+              type: object
+      summary: Delete
+      tags:
+      - msg
+  /api/v1/msg/v1/get/{tid}:
+    get:
+      description: |-
+        message api
+        user can get exist msg with target id
+      parameters:
+      - description: target id
+        in: path
+        name: tid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Msg'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Msg'
+                  type: array
+              type: object
+      summary: Get
+      tags:
+      - msg
+  /api/v1/msg/v1/list:
+    get:
+      description: |-
+        message api
+        user can get exist msg list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Msg'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/web.MsgList'
+                  type: array
+              type: object
+      summary: List
+      tags:
+      - msg
+  /api/v1/msg/v1/recall/{tid}:
+    get:
+      description: |-
+        message api
+        user can recall msg sent in 10 minutes
+      parameters:
+      - description: target id
+        in: path
+        name: tid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Msg'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Msg'
+              type: object
+      summary: Recall
+      tags:
+      - msg
+  /api/v1/msg/v1/send/{tid}:
+    post:
+      description: |-
+        message api
+        user can send msg with name
+      parameters:
+      - description: target id
+        in: path
+        name: tid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Msg'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Msg'
+              type: object
+      summary: Send
+      tags:
+      - msg
+  /api/v1/user/login:
+    post:
+      description: |-
+        Login api
+        user can login with name
+      parameters:
+      - description: user name
+        in: formData
+        name: user
+        required: true
+        type: string
+      - description: user password
+        in: formData
+        name: pass
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.User'
+            - properties:
+                data:
+                  $ref: '#/definitions/web.User'
+              type: object
+      summary: Login
+      tags:
+      - user
+  /api/v1/user/register:
+    post:
+      description: |-
+        Register api
+        user can register with name
+      parameters:
+      - description: user name
+        in: formData
+        name: user
+        required: true
+        type: string
+      - description: user password
+        in: formData
+        name: pass
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.User'
+            - properties:
+                data:
+                  $ref: '#/definitions/web.User'
+              type: object
+      summary: Register
+      tags:
+      - user
+  /api/v1/user/whoami:
+    get:
+      description: |-
+        check id api
+        user can check id of themselves
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.User'
+            - properties:
+                data:
+                  $ref: '#/definitions/web.User'
+              type: object
+      summary: check id
+      tags:
+      - user
+  /pic/create:
+    post:
+      consumes:
+      - multipart/form-data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Pic'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Pic'
+              type: object
+      summary: upload pic
+      tags:
+      - pic
+  /pic/delete/{uuid}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: picture uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Pic'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Pic'
+              type: object
+      summary: delete user pic
+      tags:
+      - pic
+  /pic/download/{uuid}:
+    get:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: formData
+      summary: Download pic
+      tags:
+      - pic
+  /pic/list/:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Pic'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Pic'
+                  type: array
+              type: object
+      summary: Get user pic
+      tags:
+      - pic
+  /pic/list/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Pic'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Pic'
+                  type: array
+              type: object
+      summary: List all user pic (admin only)
+      tags:
+      - pic
+  /user/delete/{id}:
+    get:
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      summary: delete user (admin only)
+      tags:
+      - user
+  /user/info/{id}:
+    get:
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.User'
+            - properties:
+                data:
+                  $ref: '#/definitions/web.UserInfo'
+              type: object
+      summary: get user info
+      tags:
+      - user
+    post:
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.User'
+            - properties:
+                data:
+                  $ref: '#/definitions/web.UserInfo'
+              type: object
+      summary: Update user info
+      tags:
+      - user
+  /user/list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              allOf:
+              - $ref: '#/definitions/web.User'
+              - properties:
+                  data:
+                    $ref: '#/definitions/web.UserInfo'
+                type: object
+            type: array
+      summary: list all user info (admin only)
+      tags:
+      - user
+swagger: "2.0"
