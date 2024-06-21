@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<html>
+<head>
+    <title>报表下载</title>
+    <script src="https://cdn.zsq001.cn/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#submit").click(function() {
+            var startDate = new Date($("#start_date").val());
+            var endDate = new Date($("#end_date").val());
+            if(startDate !== "" && endDate !== "") {
+            var url = window.location.origin+ "/internal-api/get-report"
+                + "?syear=" + startDate.getFullYear()
+                + "&smonth=" + (startDate.getMonth()+1)
+                + "&sday=" + startDate.getDate()
+                + "&eyear=" + endDate.getFullYear()
+                + "&emonth=" + (endDate.getMonth()+1)
+                + "&eday=" + endDate.getDate();
+                fetch(url)
+                    .then(response => response.text())  // 改为获取文本数据
+                    .then(data => {
+                        // 调用新的函数来处理数据
+                        displayDataAsTable(data);
+                    })
+                    .catch(e => console.error(e));
+        } else {
+            alert("Please select start and end dates.");
+        }
+        });
+        });
+        function displayDataAsTable(csvData) {
+            // 解析 CSV 数据
+            var lines=csvData.split("\n");
+            var result = [];
+            var headers=lines[0].split(",");
+            for(var i=1;i<lines.length;i++){
+                var obj = {};
+                var currentline=lines[i].split(",");
+                for(var j=0;j<headers.length;j++){
+                    obj[headers[j]] = currentline[j];
+                }
+                result.push(obj);
+            }
+            // 创建一个 HTML 表格来显示数据
+            var table = document.createElement("table");
+            var tr = table.insertRow(-1); // 表头
+            for (var i = 0; i < headers.length; i++) {
+                var th = document.createElement("th");
+                th.innerHTML = headers[i];
+                tr.appendChild(th);
+            }
+            // 添加 JSON 数据到表格
+            for (var i = 0; i < result.length-1; i++) {
+                tr = table.insertRow(-1);
+                for (var j = 0; j < headers.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = result[i][headers[j]];
+                }
+            }
+            // 添加表格到 HTML body
+            var divContainer = document.getElementById("showData");
+            divContainer.innerHTML = "";
+            divContainer.appendChild(table);
+        }
+    </script>
+</head>
+<body>
+<h3>报表下载</h3>
+<label for="start_date">选择开始日期:</label><br>
+<input type="date" id="start_date" name="start_date"><br>
+<label for="end_date">选择结束日期:</label><br>
+<input type="date" id="end_date" name="end_date"><br>
+<button id="submit">确定</button>
+<div id="showData"></div>
+</body>
+</html>

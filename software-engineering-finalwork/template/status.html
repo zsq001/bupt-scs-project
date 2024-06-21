@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>{{ .title }}</title>
+    <script>
+        async function submitForm() {
+            let power = document.getElementById('power').value;
+            let mode = document.getElementById('mode').value;
+            let temp = document.getElementById('temp').value;
+            let response = await fetch(window.location.origin+`/internal-api/edit?power=${power}&mode=${mode}&temp=${temp}`);
+            let data = await response.json();
+            if (data.code !== 200) {
+                alert("Error: " + data.error);
+                return;
+            }
+            document.querySelector('h3').innerText = 'Main AC Status';
+            document.getElementById('powerStatus').innerText = `Power: ${data.data.Power ? 'On' : 'Off'}`;
+            document.getElementById('modeStatus').innerText = `Mode: ${data.data.Mode}`;
+            document.getElementById('tempStatus').innerText = `Temperature: ${data.data.Temperature}`;
+            alert("AC status updated successfully");
+        }
+    </script>
+</head>
+<body>
+<h3>Main AC Status</h3>
+<p id="powerStatus">Power: {{ .power }}</p>
+<p id="modeStatus">
+    Mode: {{ .mode }}
+</p>
+<p id="tempStatus">
+    Temperature: {{ .temp }}
+</p>
+<br/>
+<form onSubmit="event.preventDefault(); submitForm();">
+<label for="power">Power:</label><br>
+<select id="power">
+    <option value="on">On</option>
+    <option value="off">Off</option>
+</select><br>
+<label for="mode">Mode:</label><br>
+<select id="mode">
+    <option value="hot">Hot</option>
+    <option value="cold">Cold</option>
+</select><br>
+<label for="temp">Temperature:</label><br>
+<input type="number" id="temp" name="temp"><br>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
